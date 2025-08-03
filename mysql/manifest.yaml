@@ -1,0 +1,94 @@
+apiVersion : v1 
+kind: Secret
+metadata:
+  name: mysql
+  namespace: roboshop
+  labels:
+    project: roboshop
+    component: mysql
+    tier: DB
+type: Opaque
+data:
+  MYSQL_ROOT_PASSWORD: Um9ib1Nob3BAMQ==
+---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: mysql-headless
+  namespace: roboshop
+  labels:
+    project: roboshop
+    component: mysql
+    tier: DB
+spec:
+  clusterIP: None
+  selector:
+    project: roboshop
+    component: mysql
+    tier: DB
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: mysql
+  namespace: roboshop
+  labels:
+    project: roboshop
+    component: mysql
+    tier: DB
+spec:
+  selector:
+    project: roboshop
+    component: mysql
+    tier: DB
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+--- 
+apiVersion : apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  namespace: roboshop
+  labels:
+    project: roboshop
+    component: mysql
+    tier: DB
+spec:
+  replicas: 2
+  serviceName: "redis-headless"
+  selector:
+    matchLabels:
+      project: roboshop
+      component: mysql
+      tier: DB
+  template:
+    metadata:
+      labels:
+        project: roboshop
+        component: mysql
+        tier: DB
+    spec:
+      containers:
+      - name: mysql
+        image: maheswari450/mysql-optimise:v1
+        envFrom:
+        - secretRef:
+            name: mysql
+        volumeMounts:
+        - name: mysql-data-pvc
+          mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-data-pvc
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: ebs-sc
+      resources:
+        requests:
+          storage: 2Gi
