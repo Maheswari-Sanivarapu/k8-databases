@@ -105,13 +105,13 @@ spec:
           mountPath: /usr/share/nginx/html
           subPath: nginx.conf
           readOnly: true
-  volumes:
-  - name: frontend-data
-    configMap:
-      name: nginx.conf
-      items:
-      - key: nginx.conf
-        path: nginx.conf
+      volumes:
+      - name: frontend-data
+        configMap:
+          name: nginx.conf
+          items:
+          - key: nginx.conf
+            path: nginx.conf
 ---
 apiVersion: v1 
 kind: Service
