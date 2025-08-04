@@ -102,13 +102,13 @@ spec:
         image: maheswari450/frontend-optimise:v1
         volumeMounts:
         - name: frontend-data
-          mountPath: /usr/share/nginx/html
+          mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
           readOnly: true
       volumes:
       - name: frontend-data
         configMap:
-          name: nginx.conf
+          name: nginx-conf
           items:
           - key: nginx.conf
             path: nginx.conf
