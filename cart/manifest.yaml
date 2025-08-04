@@ -56,6 +56,10 @@ kind: Service
 metadata:
   name: cart
   namespace: roboshop
+  labels:
+    project: roboshop
+    component: cart 
+    tier: app
 spec:
   selector:
     project: roboshop
