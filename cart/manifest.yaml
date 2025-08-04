@@ -40,9 +40,16 @@ spec:
       containers:
       - name: cart
         image: maheswari450/cart-optimise:v1
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "100m"
+            memory: "256Mi"
         envFrom:
-          - configMapRef:
-              name: cart
+        - configMapRef:
+            name: cart
 ---
 apiVersion: v1 
 kind: Service
