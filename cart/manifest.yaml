@@ -1,40 +1,41 @@
-apiVersion: v1 
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cart
   namespace: roboshop
   labels:
+    component: cart
     project: roboshop
-    component: cart 
     tier: app
 data:
-  REDIS_HOST: "redis" 
-  CATALOGUE_HOST: "catalogue" 
-  CATALOGUE_PORT: "8080" 
+  REDIS_HOST: "redis"
+  CATALOGUE_HOST: "catalogue"
+  CATALOGUE_PORT: "8080"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cart 
+  name: cart
   namespace: roboshop
+  # deployment labels
   labels:
+    component: cart
     project: roboshop
-    component: cart 
     tier: app
-spec: 
+spec:
   replicas: 1
   # These are the labels replica set use to create pod replicas, this should match pod labels
   selector:
     matchLabels:
+      component: cart
       project: roboshop
-      component: cart 
       tier: app
-    # This is pod definition
+  # This is pod definition
   template:
     metadata:
-      labels: 
+      labels:
+        component: cart
         project: roboshop
-        component: cart 
         tier: app
     spec:
       containers:
@@ -51,24 +52,24 @@ spec:
         - configMapRef:
             name: cart
 ---
-apiVersion: v1 
+apiVersion: v1
 kind: Service
 metadata:
   name: cart
   namespace: roboshop
   labels:
+    component: cart
     project: roboshop
-    component: cart 
     tier: app
 spec:
   selector:
+    component: cart
     project: roboshop
-    component: cart 
     tier: app
   ports:
   - protocol: TCP
-    port: 8080
-    targetPort: 8080
+    port: 8080 # service port
+    targetPort: 8080 # container port
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -83,9 +84,101 @@ spec:
   minReplicas: 1
   maxReplicas: 10
   metrics:
-  - type: Resource 
-    resource: 
+  - type: Resource
+    resource:
       name: cpu
-      target: 
+      target:
         type: Utilization
         averageUtilization: 10
+
+# apiVersion: v1 
+# kind: ConfigMap
+# metadata:
+#   name: cart
+#   namespace: roboshop
+#   labels:
+#     project: roboshop
+#     component: cart 
+#     tier: app
+# data:
+#   REDIS_HOST: "redis" 
+#   CATALOGUE_HOST: "catalogue" 
+#   CATALOGUE_PORT: "8080" 
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: cart 
+#   namespace: roboshop
+#   labels:
+#     project: roboshop
+#     component: cart 
+#     tier: app
+# spec: 
+#   replicas: 1
+#   # These are the labels replica set use to create pod replicas, this should match pod labels
+#   selector:
+#     matchLabels:
+#       project: roboshop
+#       component: cart 
+#       tier: app
+#     # This is pod definition
+#   template:
+#     metadata:
+#       labels: 
+#         project: roboshop
+#         component: cart 
+#         tier: app
+#     spec:
+#       containers:
+#       - name: cart
+#         image: maheswari450/cart-optimise:v1
+#         resources:
+#           requests:
+#             cpu: "50m"
+#             memory: "128Mi"
+#           limits:
+#             cpu: "100m"
+#             memory: "256Mi"
+#         envFrom:
+#         - configMapRef:
+#             name: cart
+# ---
+# apiVersion: v1 
+# kind: Service
+# metadata:
+#   name: cart
+#   namespace: roboshop
+#   labels:
+#     project: roboshop
+#     component: cart 
+#     tier: app
+# spec:
+#   selector:
+#     project: roboshop
+#     component: cart 
+#     tier: app
+#   ports:
+#   - protocol: TCP
+#     port: 8080
+#     targetPort: 8080
+# ---
+# apiVersion: autoscaling/v2
+# kind: HorizontalPodAutoscaler
+# metadata:
+#   name: cart
+#   namespace: roboshop
+# spec:
+#   scaleTargetRef:
+#     apiVersion: apps/v1
+#     kind: Deployment
+#     name: cart
+#   minReplicas: 1
+#   maxReplicas: 10
+#   metrics:
+#   - type: Resource 
+#     resource: 
+#       name: cpu
+#       target: 
+#         type: Utilization
+#         averageUtilization: 10
